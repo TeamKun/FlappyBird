@@ -1,0 +1,16 @@
+# 衝突判定のブロックとの距離
+
+distance: 0.1
+
+# ジャンプの強さ
+
+jumpPower: 1.0
+
+# 常時移動 (Block/Tick ?)
+# 絶対軸
+x: 0
+z: 0
+
+# 相対軸
+forward: 0
+right: 0
