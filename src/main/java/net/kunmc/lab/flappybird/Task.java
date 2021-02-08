@@ -32,7 +32,7 @@ public class Task extends BukkitRunnable {
             if (flappybird.isDebug()) {
                 return;
             }
-            player.sendActionBar(flappybird.isClickMode() ? "羽根を持ってクリックでジャンプ！" : "スペースを２回押してジャンプ！");
+            player.sendActionBar(flappybird.isClickMode() ? "スペースを２回押すか羽根を持ってクリックでジャンプ！" : "スペースを２回押してジャンプ！");
             move(player);
         });
     }
@@ -57,6 +57,12 @@ public class Task extends BukkitRunnable {
         if (!isTouching) {
             return;
         }
+        if (player.isDead()) {
+            return;
+        }
+        if (player.getTicksLived() < 40) {
+            return;
+        }
         player.damage(1000);
     }
 
@@ -72,6 +78,9 @@ public class Task extends BukkitRunnable {
         double right = flappybird.getConfig().getDouble("right", 0);
         Vector v2 = new Vector(forward, 0, right).rotateAroundY(Math.toRadians((- 90 - player.getLocation().getYaw())));
         if (v1.length() == 0 && v2.length() == 0) {
+            return;
+        }
+        if (player.getTicksLived() < 40) {
             return;
         }
         vector.add(v1).add(v2);

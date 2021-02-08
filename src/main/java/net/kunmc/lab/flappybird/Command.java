@@ -5,7 +5,6 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
 
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -81,7 +80,7 @@ public class Command implements TabExecutor {
                     }
                     boolean value = Boolean.parseBoolean(args[1]);
                     flappybird.setClickMode(value);
-                    sender.sendMessage(new StringBuilder().append(ChatColor.GREEN).append(String.format("ジャンプモードを %s に設定しました", value ? "クリック" : "スペース")).toString());
+                    sender.sendMessage(new StringBuilder().append(ChatColor.GREEN).append(String.format("クリックでのジャンプを %s に設定しました", value)).toString());
                 } else {
                     sender.sendMessage(new StringBuilder().append(ChatColor.RED).append("無効な引数です！").toString());
                     return true;
@@ -107,7 +106,7 @@ public class Command implements TabExecutor {
                         .append("\n")
                         .append(String.format(ChatColor.RESET + "強制スペクテイターモード: %s", flappybird.isForceSpectator() ? ChatColor.GREEN + "有効" : ChatColor.RED + "無効"))
                         .append("\n")
-                        .append(String.format(ChatColor.RESET + "ジャンプモード: " + ChatColor.AQUA + " %s", flappybird.isClickMode() ? "クリック" : "スペース"))
+                        .append(String.format(ChatColor.RESET + "クリックでのジャンプ:　" + ChatColor.AQUA + " %s", flappybird.isClickMode() ? ChatColor.GREEN + "有効" : ChatColor.RED + "無効"))
                         .append("\n")
                         .append(String.format(ChatColor.RESET + "デバック: %s", flappybird.isDebug() ? ChatColor.GREEN + "有効" : ChatColor.RED + "無効"))
                         .toString());

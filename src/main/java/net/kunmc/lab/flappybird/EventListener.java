@@ -24,6 +24,7 @@ public class EventListener implements Listener {
         if (!shouldHandleEvent(event)) {
             return;
         }
+        player.setTicksLived(1);
         flappybird.jump(player);
         if (flappybird.isClickMode()) {
             player.getInventory().addItem(new ItemStack(Material.FEATHER));
@@ -49,6 +50,7 @@ public class EventListener implements Listener {
         if (!shouldHandleEvent(event)) {
             return;
         }
+        player.setTicksLived(1);
         flappybird.jump(player);
         if (flappybird.isClickMode()) {
             player.getInventory().addItem(new ItemStack(Material.FEATHER));
@@ -58,13 +60,7 @@ public class EventListener implements Listener {
     @EventHandler
     public void jump(PlayerToggleFlightEvent event) {
         Player player = event.getPlayer();
-        if (flappybird.isClickMode()) {
-            if (!player.isFlying()) {
-                event.setCancelled(true);
-            }
-            return;
-        }
-        GameMode gamemode = event.getPlayer().getGameMode();
+        GameMode gamemode = player.getGameMode();
         if (gamemode.equals(GameMode.CREATIVE) || gamemode.equals(GameMode.SPECTATOR)) {
             return;
         }
@@ -75,12 +71,6 @@ public class EventListener implements Listener {
             event.setCancelled(true);
         }
         flappybird.jump(player);
-    }
-
-    @EventHandler
-    public void gamemodeChange(PlayerGameModeChangeEvent event) {
-        Player player = event.getPlayer();
-        player.setAllowFlight(true);
     }
 
     @EventHandler
