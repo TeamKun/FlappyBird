@@ -106,7 +106,7 @@ public class Command implements TabExecutor {
                         .append("\n")
                         .append(String.format(ChatColor.RESET + "強制スペクテイターモード: %s", flappybird.isForceSpectator() ? ChatColor.GREEN + "有効" : ChatColor.RED + "無効"))
                         .append("\n")
-                        .append(String.format(ChatColor.RESET + "クリックでのジャンプ:　" + ChatColor.AQUA + " %s", flappybird.isClickMode() ? ChatColor.GREEN + "有効" : ChatColor.RED + "無効"))
+                        .append(String.format(ChatColor.RESET + "クリックでのジャンプ: " + ChatColor.AQUA + " %s", flappybird.isClickMode() ? ChatColor.GREEN + "有効" : ChatColor.RED + "無効"))
                         .append("\n")
                         .append(String.format(ChatColor.RESET + "デバック: %s", flappybird.isDebug() ? ChatColor.GREEN + "有効" : ChatColor.RED + "無効"))
                         .toString());
