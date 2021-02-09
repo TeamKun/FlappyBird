@@ -47,6 +47,7 @@ public final class Flappybird extends JavaPlugin {
                     Bukkit.getOnlinePlayers().forEach(player -> {
                         player.getInventory().clear();
                         player.getInventory().addItem(new ItemStack(Material.FEATHER));
+                        player.setAllowFlight(true);
                     });
                 }
                 if (count > 0) {
