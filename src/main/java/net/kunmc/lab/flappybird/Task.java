@@ -29,10 +29,7 @@ public class Task extends BukkitRunnable {
                 return;
             }
             collisionCheck(player);
-            if (flappybird.isDebug()) {
-                return;
-            }
-            player.sendActionBar(flappybird.isClickMode() ? "スペースを２回押すか羽根を持ってクリックでジャンプ！" : "スペースを２回押してジャンプ！");
+            player.sendActionBar(flappybird.ACTIONBAR);
             move(player);
         });
     }

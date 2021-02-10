@@ -6,6 +6,10 @@ distance: 0.1
 
 jumpPower: 1.0
 
+# 効果音のピッチ 0.5 ~ 2.0
+
+pitch: 0.5
+
 # 常時移動 (Block/Tick ?)
 # 絶対軸
 x: 0

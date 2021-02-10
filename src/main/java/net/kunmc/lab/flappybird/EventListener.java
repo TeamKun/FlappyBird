@@ -1,13 +1,12 @@
 package net.kunmc.lab.flappybird;
 
 import org.bukkit.GameMode;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.*;
-import org.bukkit.inventory.ItemStack;
 
 public class EventListener implements Listener {
 
@@ -20,15 +19,18 @@ public class EventListener implements Listener {
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
-        player.setAllowFlight(true);
+        flappybird.getPlayerChargeStartTime().put(player, (long) 0);
         if (!shouldHandleEvent(event)) {
             return;
         }
         player.setTicksLived(1);
         flappybird.jump(player);
-        if (flappybird.isClickMode()) {
-            player.getInventory().addItem(new ItemStack(Material.FEATHER));
-        }
+    }
+
+    @EventHandler
+    public void onLeave(PlayerQuitEvent event) {
+        Player player = event.getPlayer();
+        flappybird.getPlayerChargeStartTime().remove(player);
     }
 
     @EventHandler
@@ -46,51 +48,48 @@ public class EventListener implements Listener {
     @EventHandler
     public void onRespawn(PlayerRespawnEvent event) {
         Player player = event.getPlayer();
-        player.setAllowFlight(true);
         if (!shouldHandleEvent(event)) {
             return;
         }
         player.setTicksLived(1);
         flappybird.jump(player);
-        if (flappybird.isClickMode()) {
-            player.getInventory().addItem(new ItemStack(Material.FEATHER));
-        }
     }
 
     @EventHandler
-    public void jump(PlayerToggleFlightEvent event) {
+    public void jump(PlayerToggleSneakEvent event) {
         Player player = event.getPlayer();
         GameMode gamemode = player.getGameMode();
         if (gamemode.equals(GameMode.CREATIVE) || gamemode.equals(GameMode.SPECTATOR)) {
             return;
         }
-        if (flappybird.isDebug()) {
+        if (!player.isSneaking()) {
             return;
-        }
-        if (!player.isFlying()) {
-            event.setCancelled(true);
         }
         flappybird.jump(player);
     }
 
     @EventHandler
-    public void jump(PlayerInteractEvent event) {
-        if (!flappybird.isClickMode()) {
-            return;
-        }
-        GameMode gamemode = event.getPlayer().getGameMode();
+    public void onSneakStart(PlayerToggleSneakEvent event) {
+        Player player = event.getPlayer();
+        GameMode gamemode = player.getGameMode();
         if (gamemode.equals(GameMode.CREATIVE) || gamemode.equals(GameMode.SPECTATOR)) {
             return;
         }
-        ItemStack itemStack = event.getItem();
-        if (itemStack == null) {
+        if (player.isSneaking()) {
             return;
         }
-        if (!itemStack.getType().equals(Material.FEATHER)) {
+        flappybird.getPlayerChargeStartTime().replace(player, System.currentTimeMillis());
+    }
+
+    @EventHandler
+    public void onDamage(EntityDamageEvent event) {
+        if (!(event.getEntity() instanceof Player)) {
             return;
         }
-        Player player = event.getPlayer();
-        flappybird.jump(player);
+        if (!event.getCause().equals(EntityDamageEvent.DamageCause.FALL)) {
+            return;
+        }
+        event.setCancelled(true);
     }
 
     public boolean shouldHandleEvent(PlayerEvent event) {
