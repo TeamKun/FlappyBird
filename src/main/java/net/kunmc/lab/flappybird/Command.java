@@ -91,8 +91,9 @@ public class Command implements TabExecutor {
                     return true;
                 }
                 flappybird.getConfig().set(key, value);
-
+                sender.sendMessage(new StringBuilder().append(ChatColor.GREEN).append(String.format("%s を %s に設定しました", key, value)).toString());
             default:
+                sender.sendMessage(new StringBuilder().append(ChatColor.RED).append("無効な引数です！").toString());
                 break;
         }
 
