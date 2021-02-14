@@ -52,7 +52,7 @@ public final class Flappybird extends JavaPlugin {
                     Bukkit.getOnlinePlayers().forEach(player -> {
                         player.sendTitle("スタート！", TITLE, 0, 25, 10);
                         player.playSound(player.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_BLAST, SoundCategory.NEUTRAL, 1, 1);
-                        jump(player);
+                        forceJump(player);
                     });
                 } else if (count < 0) {
                     active = true;
@@ -66,13 +66,18 @@ public final class Flappybird extends JavaPlugin {
 
     public void stop() {
         active = false;
+        String message = "ゲーム終了！";
+        Bukkit.getOnlinePlayers().forEach(player -> {
+            player.sendTitle(message, "", 0, 25, 10);
+            player.playSound(player.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_BLAST, SoundCategory.NEUTRAL, 1, 1);
+        });
     }
 
     public void jump(Player player) {
-        double power = getConfig().getDouble("jumpPower", 1.0);
+        double power = getConfig().getDouble("jumpMin", 0);
         long chargeTime = System.currentTimeMillis() - getPlayerChargeStartTime().get(player);
-        double charge = Math.max(Math.min(chargeTime, 400), 200);
-        power *= (charge / 400);
+        double ratio = (chargeTime / 50) * getConfig().getDouble("ratio", 0) + 1.0;
+        power = Math.min(power * ratio, getConfig().getDouble("jumpMax", 0));
         Vector vector = player.getVelocity().setY(power);
         player.setVelocity(vector);
 
@@ -86,6 +91,12 @@ public final class Flappybird extends JavaPlugin {
             player.getWorld().spawnParticle(Particle.CLOUD, player.getLocation().toVector().add(add).toLocation(player.getWorld()), 1, 0, 0 ,0, 0);
             add.rotateAroundY(Math.toRadians(rotation));
         }
+    }
+
+    public void forceJump(Player player) {
+        double power = getConfig().getDouble("forceJump", 1.0);
+        Vector vector = player.getVelocity().setY(power);
+        player.setVelocity(vector);
     }
 
     public boolean isActivating() {

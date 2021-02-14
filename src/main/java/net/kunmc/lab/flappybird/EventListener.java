@@ -19,12 +19,13 @@ public class EventListener implements Listener {
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
-        flappybird.getPlayerChargeStartTime().put(player, (long) 0);
+        flappybird.getPlayerChargeStartTime().put(player, System.currentTimeMillis());
+        flappybird.getPlayerChargeStartTime().computeIfAbsent(player, p -> System.currentTimeMillis());
         if (!shouldHandleEvent(event)) {
             return;
         }
         player.setTicksLived(1);
-        flappybird.jump(player);
+        flappybird.forceJump(player);
     }
 
     @EventHandler
@@ -52,7 +53,7 @@ public class EventListener implements Listener {
             return;
         }
         player.setTicksLived(1);
-        flappybird.jump(player);
+        flappybird.forceJump(player);
     }
 
     @EventHandler

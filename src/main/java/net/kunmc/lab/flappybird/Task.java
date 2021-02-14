@@ -36,7 +36,7 @@ public class Task extends BukkitRunnable {
 
     private void collisionCheck(Player player) {
         World world = player.getWorld();
-        double expand = flappybird.getConfig().getDouble("distance");
+        double expand = flappybird.getConfig().getDouble("distance", 0);
         BoundingBox bbox = new BoundingBox().copy(player.getBoundingBox()).expand(expand, expand, expand, expand, expand, expand);
         Location locationMin = bbox.getMin().toLocation(world);
         Location locationMax = bbox.getMax().toLocation(world);

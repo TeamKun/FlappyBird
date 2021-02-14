@@ -73,6 +73,25 @@ public class Command implements TabExecutor {
                         .append(String.format(ChatColor.RESET + "強制スペクテイターモード: %s", flappybird.isForceSpectator() ? ChatColor.GREEN + "有効" : ChatColor.RED + "無効"))
                         .toString());
                 break;
+            case "set":
+                if (args.length < 3) {
+                    sender.sendMessage(new StringBuilder().append(ChatColor.RED).append("引数が足りません！").toString());
+                    return true;
+                }
+                String key = args[1];
+                if (!flappybird.getConfig().getValues(false).keySet().contains(key)) {
+                    sender.sendMessage(new StringBuilder().append(ChatColor.RED).append(String.format("%s という設定項目は存在しません！", key)).toString());
+                    return true;
+                }
+                double value;
+                try {
+                    value = Double.parseDouble(args[2]);
+                } catch (NumberFormatException e) {
+                    sender.sendMessage(new StringBuilder().append(ChatColor.RED).append("第３引数は数にしてください！").toString());
+                    return true;
+                }
+                flappybird.getConfig().set(key, value);
+
             default:
                 break;
         }
@@ -84,18 +103,17 @@ public class Command implements TabExecutor {
     public List<String> onTabComplete(CommandSender sender, org.bukkit.command.Command command, String alias, String[] args) {
         List<String> suggestions = null;
 
-        switch (args.length) {
-            case 1:
-                suggestions = new ArrayList<>(Arrays.asList("start", "stop", "reload", "forceSpectator", "status")).stream().filter(s -> s.contains(args[0])).collect(Collectors.toList());
-                break;
-            case 2:
-                List<String> trueOrFalses = new ArrayList<>(Arrays.asList("forceSpectator"));
-                if (trueOrFalses.contains(args[0])) {
+        if (args.length == 1) {
+            suggestions = new ArrayList<>(Arrays.asList("start", "stop", "reload", "forceSpectator", "status", "set")).stream().filter(s -> s.contains(args[0])).collect(Collectors.toList());
+        } else if (args.length == 2) {
+            switch (args[0]) {
+                case "forceSpectator":
                     suggestions = new ArrayList<>(Arrays.asList("true", "false")).stream().filter(s -> s.contains(args[1])).collect(Collectors.toList());
-                }
-                break;
-            default:
-                break;
+                    break;
+                case "set":
+                    suggestions = flappybird.getConfig().getValues(false).keySet().stream().filter(s -> s.contains(args[1])).collect(Collectors.toList());
+                    break;
+            }
         }
 
         return suggestions;
