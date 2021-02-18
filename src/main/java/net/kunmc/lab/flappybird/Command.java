@@ -5,6 +5,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -49,10 +50,6 @@ public class Command implements TabExecutor {
                     flappybird.stop();
                 }
                 break;
-            case "reload":
-                flappybird.reloadConfig();
-                sender.sendMessage(new StringBuilder().append(ChatColor.GREEN).append(String.format("設定ファイルを再読み込みしました")).toString());
-                break;
             case "forceSpectator":
                 if (args.length < 2) {
                     sender.sendMessage(new StringBuilder().append(ChatColor.RED).append("引数が足りません！").toString());
@@ -73,25 +70,9 @@ public class Command implements TabExecutor {
                         .append(String.format(ChatColor.RESET + "強制スペクテイターモード: %s", flappybird.isForceSpectator() ? ChatColor.GREEN + "有効" : ChatColor.RED + "無効"))
                         .toString());
                 break;
-            case "set":
-                if (args.length < 3) {
-                    sender.sendMessage(new StringBuilder().append(ChatColor.RED).append("引数が足りません！").toString());
-                    return true;
-                }
-                String key = args[1];
-                if (!flappybird.getConfig().getValues(false).keySet().contains(key)) {
-                    sender.sendMessage(new StringBuilder().append(ChatColor.RED).append(String.format("%s という設定項目は存在しません！", key)).toString());
-                    return true;
-                }
-                double value;
-                try {
-                    value = Double.parseDouble(args[2]);
-                } catch (NumberFormatException e) {
-                    sender.sendMessage(new StringBuilder().append(ChatColor.RED).append("第３引数は数にしてください！").toString());
-                    return true;
-                }
-                flappybird.getConfig().set(key, value);
-                sender.sendMessage(new StringBuilder().append(ChatColor.GREEN).append(String.format("%s を %s に設定しました", key, value)).toString());
+            case "config":
+                config(sender, command, label, args);
+                break;
             default:
                 sender.sendMessage(new StringBuilder().append(ChatColor.RED).append("無効な引数です！").toString());
                 break;
@@ -105,18 +86,68 @@ public class Command implements TabExecutor {
         List<String> suggestions = null;
 
         if (args.length == 1) {
-            suggestions = new ArrayList<>(Arrays.asList("start", "stop", "reload", "forceSpectator", "status", "set")).stream().filter(s -> s.contains(args[0])).collect(Collectors.toList());
+            suggestions = new ArrayList<>(Arrays.asList("start", "stop", "config", "forceSpectator", "status")).stream().filter(s -> s.contains(args[0])).collect(Collectors.toList());
         } else if (args.length == 2) {
             switch (args[0]) {
                 case "forceSpectator":
                     suggestions = new ArrayList<>(Arrays.asList("true", "false")).stream().filter(s -> s.contains(args[1])).collect(Collectors.toList());
                     break;
-                case "set":
-                    suggestions = flappybird.getConfig().getValues(false).keySet().stream().filter(s -> s.contains(args[1])).collect(Collectors.toList());
+                case "config":
+                    suggestions = new ArrayList<>(Arrays.asList("set", "reset", "reload", "save")).stream().filter(s -> s.contains(args[1])).collect(Collectors.toList());
                     break;
+            }
+        } else if(args.length == 3) {
+            if (args[0].equals("config") && (args[1].equals("set"))) {
+                suggestions = flappybird.getConfig().getValues(false).keySet().stream().filter(s -> s.contains(args[2])).collect(Collectors.toList());
             }
         }
 
         return suggestions;
+    }
+
+    private void config(CommandSender sender, org.bukkit.command.Command command, String alias, String[] args) {
+        switch (args[1]) {
+            case "set":
+                String key = args[2];
+                if (!flappybird.getConfig().getValues(false).keySet().contains(key)) {
+                    sender.sendMessage(new StringBuilder().append(ChatColor.RED).append(String.format("%s という設定項目は存在しません！", key)).toString());
+                    return;
+                }
+                if (args.length < 4) {
+                    double value = flappybird.getConfig().getDouble(key);
+                    sender.sendMessage(new StringBuilder()
+                            .append(ChatColor.GREEN)
+                            .append(String.format("%s の値は %s です", key, value)).toString());
+                    return;
+                }
+                double value;
+                try {
+                    value = Double.parseDouble(args[3]);
+                } catch (NumberFormatException e) {
+                    sender.sendMessage(new StringBuilder().append(ChatColor.RED).append("第３引数は数にしてください！").toString());
+                    return;
+                }
+                flappybird.getConfig().set(key, value);
+                sender.sendMessage(new StringBuilder().append(ChatColor.GREEN).append(String.format("%s を %s に設定しました", key, value)).toString());
+                break;
+            case "reset":
+                File file = new File(flappybird.getDataFolder(), "config.yml");
+                file.delete();
+                flappybird.saveDefaultConfig();
+                flappybird.reloadConfig();
+                sender.sendMessage(new StringBuilder().append(ChatColor.GREEN).append("設定ファイルを再生成しました").toString());
+                break;
+            case "reload":
+                flappybird.reloadConfig();
+                sender.sendMessage(new StringBuilder().append(ChatColor.GREEN).append(String.format("設定ファイルを再読み込みしました")).toString());
+                break;
+            case "save":
+                flappybird.saveConfig();
+                sender.sendMessage(new StringBuilder().append(ChatColor.GREEN).append(String.format("設定ファイルを再読み込みしました")).toString());
+                break;
+            default:
+                sender.sendMessage(new StringBuilder().append(ChatColor.RED).append("無効な引数です！").toString());
+                break;
+        }
     }
 }

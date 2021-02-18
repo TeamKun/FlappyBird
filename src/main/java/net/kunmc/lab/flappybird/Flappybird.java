@@ -81,7 +81,8 @@ public final class Flappybird extends JavaPlugin {
         Vector vector = player.getVelocity().setY(power);
         player.setVelocity(vector);
 
-        float pitch = (float) Math.max(Math.min(getConfig().getDouble("pitch", 0.5), 2.0), 0.5);
+        double pitchRatio = getConfig().getDouble("pitchRatio", 0.5);
+        float pitch = (float) Math.max(Math.min((1 / ratio * pitchRatio), 2.0), 0.5);
         player.getWorld().playSound(player.getLocation(), "jump", SoundCategory.NEUTRAL, 1.0f, pitch);
         Vector add = new Vector(1, 0, 0);
         double radis = 1;

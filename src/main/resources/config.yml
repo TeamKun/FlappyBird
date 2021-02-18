@@ -15,9 +15,10 @@ ratio: 0.2
 
 # ジャンプ力 = ( ratio * チャージ時間(tick) + 1 ) * jumpPower
 
-# 効果音のピッチ 0.5 ~ 2.0
+# ジャンプ倍率の対するピッチの変化量
+pitchRatio: 2.0
 
-pitch: 0.5
+# pitch = 1 / (ジャンプ倍率 * pitchRatio)
 
 # 常時移動 (Block/Tick ?)
 # 絶対軸
