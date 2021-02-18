@@ -64,10 +64,25 @@ public class Command implements TabExecutor {
                     return true;
                 }
                 break;
+            case "training":
+                if (args.length < 2) {
+                    sender.sendMessage(new StringBuilder().append(ChatColor.RED).append("引数が足りません！").toString());
+                    return true;
+                }
+                if (args[1].equals("true") || args[1].equals("false")) {
+                    boolean value = Boolean.parseBoolean(args[1]);
+                    flappybird.setTraining(value);
+                    sender.sendMessage(new StringBuilder().append(ChatColor.GREEN).append(String.format("練習モード を %s にしました", flappybird.isTraining())).toString());
+                } else {
+                    sender.sendMessage(new StringBuilder().append(ChatColor.RED).append("無効な引数です！").toString());
+                    return true;
+                }
+                break;
             case "status":
                 sender.sendMessage(new StringBuilder()
                         .append(String.format("状態: %s", flappybird.isActive() ? ChatColor.GREEN + "進行中" : flappybird.isActivating() ? ChatColor.AQUA + "起動中" : ChatColor.RED + "停止中")).append("\n")
-                        .append(String.format(ChatColor.RESET + "強制スペクテイターモード: %s", flappybird.isForceSpectator() ? ChatColor.GREEN + "有効" : ChatColor.RED + "無効"))
+                        .append(String.format(ChatColor.RESET + "強制スペクテイターモード: %s", flappybird.isForceSpectator() ? ChatColor.GREEN + "有効" : ChatColor.RED + "無効")).append("\n")
+                        .append(String.format(ChatColor.RESET + "練習モード: %s", flappybird.isTraining() ? ChatColor.GREEN + "有効" : ChatColor.RED + "無効"))
                         .toString());
                 break;
             case "config":
@@ -86,10 +101,11 @@ public class Command implements TabExecutor {
         List<String> suggestions = null;
 
         if (args.length == 1) {
-            suggestions = new ArrayList<>(Arrays.asList("start", "stop", "config", "forceSpectator", "status")).stream().filter(s -> s.contains(args[0])).collect(Collectors.toList());
+            suggestions = new ArrayList<>(Arrays.asList("start", "stop", "config", "forceSpectator", "status", "training")).stream().filter(s -> s.contains(args[0])).collect(Collectors.toList());
         } else if (args.length == 2) {
             switch (args[0]) {
                 case "forceSpectator":
+                case "training":
                     suggestions = new ArrayList<>(Arrays.asList("true", "false")).stream().filter(s -> s.contains(args[1])).collect(Collectors.toList());
                     break;
                 case "config":
@@ -143,7 +159,7 @@ public class Command implements TabExecutor {
                 break;
             case "save":
                 flappybird.saveConfig();
-                sender.sendMessage(new StringBuilder().append(ChatColor.GREEN).append(String.format("設定ファイルを再読み込みしました")).toString());
+                sender.sendMessage(new StringBuilder().append(ChatColor.GREEN).append(String.format("設定ファイルを保存しました")).toString());
                 break;
             default:
                 sender.sendMessage(new StringBuilder().append(ChatColor.RED).append("無効な引数です！").toString());

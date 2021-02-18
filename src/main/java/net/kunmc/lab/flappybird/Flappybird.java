@@ -14,6 +14,8 @@ public final class Flappybird extends JavaPlugin {
     private boolean active = false;
     private boolean activating = false;
     private boolean forceSpectator = false;
+    private boolean training = false;
+
     public final String TITLE = "スニークキーを押してジャンプ！";
     public final String ACTIONBAR = "スニークキーを押してジャンプ！ スニークの長さでジャンプ力が変わるよ！";
 
@@ -114,5 +116,13 @@ public final class Flappybird extends JavaPlugin {
 
     public Map<Player, Long> getPlayerChargeStartTime() {
         return playerChargeStartTime;
+    }
+
+    public boolean isTraining() {
+        return training;
+    }
+
+    public void setTraining(boolean collision) {
+        this.training = collision;
     }
 }
