@@ -30,4 +30,4 @@ forward: 0
 right: 0
 
 # 操作方法の表示時間 (tick)
-tutorialTick: 100
+tutorialTick: 0

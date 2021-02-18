@@ -13,7 +13,7 @@ import org.bukkit.util.Vector;
 public class Task extends BukkitRunnable {
 
     private Flappybird flappybird;
-    private int count = 0;
+    private int count = 1;
 
     public Task(Flappybird flappybird) {
         this.flappybird = flappybird;
@@ -32,7 +32,7 @@ public class Task extends BukkitRunnable {
             if (!flappybird.isTraining()) {
                 collisionCheck(player);
             }
-            if (flappybird.getConfig().getInt("tutorialTick", 100) > count) {
+            if (flappybird.getConfig().getInt("tutorialTick", 0) > count || flappybird.isTraining()) {
                 player.sendActionBar(flappybird.ACTIONBAR);
             }
             move(player);
