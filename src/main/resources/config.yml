@@ -31,3 +31,24 @@ right: 0
 
 # 操作方法の表示時間 (tick)
 tutorialTick: 0
+
+# 更新頻度 (tick)
+collisionTick: 1
+
+# リスポーン または スタート時 の衝突無視時間 (tick)
+noCollisionTick: 40
+
+# 強制スペクテイターモード
+forceSpectator: false
+
+# 衝突時のキル
+kill: false
+
+# パーティクル
+partilce: true
+
+# ゲーム中のみジャンプを可能にするか
+jumpGameOnly: false
+
+# 衝突判定の無効化
+training: false

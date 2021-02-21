@@ -1,7 +1,8 @@
 package net.kunmc.lab.flappybird;
 
+import net.kunmc.lab.flappybird.event.PlayerCollisionEvent;
+import net.kunmc.lab.flappybird.event.PlayerScrollEvent;
 import org.bukkit.Bukkit;
-import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -13,7 +14,7 @@ import org.bukkit.util.Vector;
 public class Task extends BukkitRunnable {
 
     private Flappybird flappybird;
-    private int count = 1;
+    private int count = 0;
 
     public Task(Flappybird flappybird) {
         this.flappybird = flappybird;
@@ -25,14 +26,13 @@ public class Task extends BukkitRunnable {
             return;
         }
         Bukkit.getOnlinePlayers().forEach(player -> {
-            GameMode gamemode = player.getGameMode();
-            if (gamemode.equals(GameMode.CREATIVE) || gamemode.equals(GameMode.SPECTATOR)) {
+            if (!flappybird.isjoining(player)) {
                 return;
             }
-            if (!flappybird.isTraining()) {
+            if (!flappybird.getConfig().getBoolean("training") && count % Math.max(flappybird.getConfig().getInt("collisionTick", 1), 1) == 0) {
                 collisionCheck(player);
             }
-            if (flappybird.getConfig().getInt("tutorialTick", 0) > count || flappybird.isTraining()) {
+            if (flappybird.getConfig().getInt("tutorialTick", 0) > flappybird.getPlayerRespawnTime().get(player) || flappybird.getConfig().getBoolean("training")) {
                 player.sendActionBar(flappybird.ACTIONBAR);
             }
             move(player);
@@ -63,10 +63,18 @@ public class Task extends BukkitRunnable {
         if (player.isDead()) {
             return;
         }
-        if (player.getTicksLived() < 40) {
+        double gametime = (System.currentTimeMillis() - flappybird.getPlayerRespawnTime().get(player)) / 20;
+        if (gametime < flappybird.getConfig().getInt("noCollisionTick", 40)) {
             return;
         }
-        player.damage(1000);
+
+        PlayerCollisionEvent event = new PlayerCollisionEvent(player);
+        Bukkit.getPluginManager().callEvent(event);
+
+        if (event.isCancelled()) {
+            return;
+        }
+        flappybird.respawn(player);
     }
 
     private void move(Player player) {
@@ -76,14 +84,19 @@ public class Task extends BukkitRunnable {
         Vector vector = player.getVelocity();
         double x = flappybird.getConfig().getDouble("x", 0);
         double z = flappybird.getConfig().getDouble("z", 0);
-        Vector v1 = new Vector(x, 0, z);
         double forward = flappybird.getConfig().getDouble("forward", 0);
         double right = flappybird.getConfig().getDouble("right", 0);
-        Vector v2 = new Vector(forward, 0, right).rotateAroundY(Math.toRadians((- 90 - player.getLocation().getYaw())));
-        if (v1.length() == 0 && v2.length() == 0) {
+
+        PlayerScrollEvent event = new PlayerScrollEvent(player, x, z, forward, right);
+        Bukkit.getPluginManager().callEvent(event);
+
+        if (event.isCancelled()) {
             return;
         }
-        if (player.getTicksLived() < 40) {
+
+        Vector v1 = new Vector(event.getX(), 0, event.getZ());
+        Vector v2 = new Vector(event.getForward(), 0, event.getRight()).rotateAroundY(Math.toRadians((- 90 - player.getLocation().getYaw())));
+        if (v1.length() == 0 && v2.length() == 0) {
             return;
         }
         vector.add(v1).add(v2);

@@ -19,19 +19,16 @@ public class EventListener implements Listener {
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
-        flappybird.getPlayerChargeStartTime().put(player, System.currentTimeMillis());
-        flappybird.getPlayerChargeStartTime().computeIfAbsent(player, p -> System.currentTimeMillis());
-        if (!shouldHandleEvent(event)) {
-            return;
-        }
-        player.setTicksLived(1);
-        flappybird.forceJump(player);
+        flappybird.getPlayerChargeStartTime().putIfAbsent(player, (long) 0);
+        flappybird.getPlayerRespawnTime().putIfAbsent(player, (long) 0);
     }
 
     @EventHandler
     public void onLeave(PlayerQuitEvent event) {
         Player player = event.getPlayer();
         flappybird.getPlayerChargeStartTime().remove(player);
+        flappybird.getPlayerRespawnTime().remove(player);
+        flappybird.leave(player);
     }
 
     @EventHandler
@@ -39,31 +36,22 @@ public class EventListener implements Listener {
         if (!flappybird.isActive()) {
             return;
         }
+        if (!flappybird.isjoining(event.getEntity())) {
+            return;
+        }
         event.setDeathMessage(String.format("%s は壁に衝突してしまった", event.getEntity().getName()));
-        event.getDrops().clear();
-        if (flappybird.isForceSpectator()) {
+        if (flappybird.getConfig().getBoolean("forceSpectator")) {
             event.getEntity().setGameMode(GameMode.SPECTATOR);
         }
     }
 
     @EventHandler
-    public void onRespawn(PlayerRespawnEvent event) {
-        Player player = event.getPlayer();
-        if (!shouldHandleEvent(event)) {
-            return;
-        }
-        player.setTicksLived(1);
-        flappybird.forceJump(player);
-    }
-
-    @EventHandler
     public void jump(PlayerToggleSneakEvent event) {
         Player player = event.getPlayer();
-        GameMode gamemode = player.getGameMode();
-        if (gamemode.equals(GameMode.CREATIVE) || gamemode.equals(GameMode.SPECTATOR)) {
+        if (!player.isSneaking()) {
             return;
         }
-        if (!player.isSneaking()) {
+        if (!flappybird.isJumpable(player)) {
             return;
         }
         flappybird.jump(player);
@@ -72,10 +60,6 @@ public class EventListener implements Listener {
     @EventHandler
     public void onSneakStart(PlayerToggleSneakEvent event) {
         Player player = event.getPlayer();
-        GameMode gamemode = player.getGameMode();
-        if (gamemode.equals(GameMode.CREATIVE) || gamemode.equals(GameMode.SPECTATOR)) {
-            return;
-        }
         if (player.isSneaking()) {
             return;
         }
@@ -84,23 +68,16 @@ public class EventListener implements Listener {
 
     @EventHandler
     public void onDamage(EntityDamageEvent event) {
-        if (!(event.getEntity() instanceof Player)) {
-            return;
-        }
         if (!event.getCause().equals(EntityDamageEvent.DamageCause.FALL)) {
             return;
         }
+        if (!(event.getEntity() instanceof Player)) {
+            return;
+        }
+        Player player = (Player) event.getEntity();
+        if (!flappybird.isJumpable(player)) {
+            return;
+        }
         event.setCancelled(true);
-    }
-
-    public boolean shouldHandleEvent(PlayerEvent event) {
-        if (!flappybird.isActive()) {
-            return false;
-        }
-        GameMode gamemode = event.getPlayer().getGameMode();
-        if (gamemode.equals(GameMode.CREATIVE) || gamemode.equals(GameMode.SPECTATOR)) {
-            return false;
-        }
-        return true;
     }
 }

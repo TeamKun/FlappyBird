@@ -6,7 +6,7 @@
 
     <groupId>net.kunmc.lab</groupId>
     <artifactId>flappybird</artifactId>
-    <version>2.3</version>
+    <version>3.0</version>
     <packaging>jar</packaging>
 
     <name>Flappybird</name>
