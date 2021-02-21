@@ -1,7 +1,9 @@
 package net.kunmc.lab.flappybird;
 
-import net.kunmc.lab.flappybird.event.PlayerCollisionEvent;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
