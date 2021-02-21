@@ -32,7 +32,8 @@ public class Task extends BukkitRunnable {
             if (!flappybird.getConfig().getBoolean("training") && count % Math.max(flappybird.getConfig().getInt("collisionTick", 1), 1) == 0) {
                 collisionCheck(player);
             }
-            if (flappybird.getConfig().getInt("tutorialTick", 0) > flappybird.getPlayerRespawnTime().get(player) || flappybird.getConfig().getBoolean("training")) {
+            double gametime = (System.currentTimeMillis() - flappybird.getPlayerRespawnTime().get(player)) / 20;
+            if (flappybird.getConfig().getInt("tutorialTick", 0) > gametime || flappybird.getConfig().getBoolean("training")) {
                 player.sendActionBar(flappybird.ACTIONBAR);
             }
             move(player);
