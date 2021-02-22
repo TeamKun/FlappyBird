@@ -24,7 +24,8 @@ public final class Flappybird extends JavaPlugin {
 
     private List<Player> players = new ArrayList<>();
     private Map<Player, Long> playerChargeStartTime = new HashMap<>();
-    private Map<Player, Long> playerRespawnTime = new HashMap<>();
+    private Map<Player, Long> playerStartTime = new HashMap<>();
+    private Map<Player, Integer> playerJumpCount = new HashMap<>();
 
     @Override
     public void onEnable() {
@@ -35,7 +36,8 @@ public final class Flappybird extends JavaPlugin {
 
         Bukkit.getOnlinePlayers().forEach(player -> {
             playerChargeStartTime.putIfAbsent(player, (long) 0);
-            playerRespawnTime.putIfAbsent(player, (long) 0);
+            playerStartTime.putIfAbsent(player, (long) 0);
+            playerJumpCount.putIfAbsent(player, 0);
         });
     }
 
@@ -63,7 +65,6 @@ public final class Flappybird extends JavaPlugin {
                     Bukkit.getOnlinePlayers().forEach(player -> {
                         player.sendTitle("スタート！", TITLE, 0, 25, 10);
                         player.playSound(player.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_BLAST, SoundCategory.NEUTRAL, 1, 1);
-                        forceJump(player);
                         join(player);
                     });
                     cancel();
@@ -107,6 +108,12 @@ public final class Flappybird extends JavaPlugin {
         float pitch = (float) Math.max(Math.min((1 / rate * pitchRatio), 2.0), 0.5);
         player.getWorld().playSound(player.getLocation(), "jump", SoundCategory.NEUTRAL, 1.0f, pitch);
 
+        int jumpCount = playerJumpCount.get(player);
+        if (jumpCount == 0) {
+            playerStartTime.replace(player, System.currentTimeMillis());
+        }
+        playerJumpCount.replace(player, playerJumpCount.get(player) + 1);
+
         if (!getConfig().getBoolean("particle")) {
             return;
         }
@@ -120,18 +127,13 @@ public final class Flappybird extends JavaPlugin {
         }
     }
 
-    public void forceJump(Player player) {
-        double power = getConfig().getDouble("forceJump", 1.0);
-        Vector vector = player.getVelocity().setY(power);
-        player.setVelocity(vector);
-    }
-
     public boolean join(Player player) {
         if (players.contains(player)) {
             return false;
         }
         players.add(player);
-        playerRespawnTime.replace(player, System.currentTimeMillis());
+        playerStartTime.replace(player, System.currentTimeMillis());
+        playerJumpCount.replace(player, 0);
 
         return true;
     }
@@ -148,10 +150,13 @@ public final class Flappybird extends JavaPlugin {
         return playerChargeStartTime;
     }
 
-    public Map<Player, Long> getPlayerRespawnTime() {
-        return playerRespawnTime;
+    public Map<Player, Long> getPlayerStartTime() {
+        return playerStartTime;
     }
 
+    public Map<Player, Integer> getPlayerJumpCount() {
+        return playerJumpCount;
+    }
 
     public void respawn(Player player) {
         if (getConfig().getBoolean("kill", false)) {
@@ -159,7 +164,8 @@ public final class Flappybird extends JavaPlugin {
         } else {
             player.teleport(player.getWorld().getSpawnLocation());
         }
-        getPlayerRespawnTime().replace(player, System.currentTimeMillis());
+        getPlayerStartTime().replace(player, System.currentTimeMillis());
+        getPlayerJumpCount().replace(player, 0);
     }
 
     public boolean isJumpable(Player player) {

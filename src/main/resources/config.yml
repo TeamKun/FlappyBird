@@ -1,9 +1,6 @@
 # 衝突判定のブロックとの距離
 distance: 0.1
 
-# スタート時などの強制ジャンプ力
-forceJump: 1.0
-
 # ジャンプ力の最小値
 jumpMin: 0.5
 
@@ -35,7 +32,7 @@ tutorialTick: 0
 # 更新頻度 (tick)
 collisionTick: 1
 
-# リスポーン または スタート時 の衝突無視時間 (tick)
+# 参加時、リスポーン時の衝突判定無効時間 (tick)
 noCollisionTick: 40
 
 # 強制スペクテイターモード

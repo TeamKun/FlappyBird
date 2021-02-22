@@ -139,7 +139,6 @@ public class Command implements TabExecutor {
         String key = args[2];
         switch (key) {
             case "distance":
-            case "forceJump":
             case "jumpMax":
             case "jumpMin":
             case "x":

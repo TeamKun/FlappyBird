@@ -22,14 +22,16 @@ public class EventListener implements Listener {
     public void onJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
         flappybird.getPlayerChargeStartTime().putIfAbsent(player, (long) 0);
-        flappybird.getPlayerRespawnTime().putIfAbsent(player, (long) 0);
+        flappybird.getPlayerStartTime().putIfAbsent(player, (long) 0);
+        flappybird.getPlayerJumpCount().putIfAbsent(player, 0);
     }
 
     @EventHandler
     public void onLeave(PlayerQuitEvent event) {
         Player player = event.getPlayer();
         flappybird.getPlayerChargeStartTime().remove(player);
-        flappybird.getPlayerRespawnTime().remove(player);
+        flappybird.getPlayerStartTime().remove(player);
+        flappybird.getPlayerJumpCount().remove(player);
         flappybird.leave(player);
     }
 

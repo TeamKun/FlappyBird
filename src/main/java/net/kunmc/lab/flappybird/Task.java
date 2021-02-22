@@ -29,15 +29,18 @@ public class Task extends BukkitRunnable {
             if (!flappybird.isjoining(player)) {
                 return;
             }
-            if (!flappybird.getConfig().getBoolean("training") && count % Math.max(flappybird.getConfig().getInt("collisionTick", 1), 1) == 0) {
-                collisionCheck(player);
-            }
-            double gametime = (System.currentTimeMillis() - flappybird.getPlayerRespawnTime().get(player)) / 20;
+            double gametime = (System.currentTimeMillis() - flappybird.getPlayerStartTime().get(player)) / 20;
             if (flappybird.getConfig().getInt("tutorialTick", 0) > gametime || flappybird.getConfig().getBoolean("training")) {
                 player.sendActionBar(flappybird.ACTIONBAR);
             }
+            if (flappybird.getPlayerJumpCount().get(player) == 0) {
+                return;
+            }
             if (gametime < flappybird.getConfig().getInt("noCollisionTick", 40)) {
                 return;
+            }
+            if (!flappybird.getConfig().getBoolean("training") && count % Math.max(flappybird.getConfig().getInt("collisionTick", 1), 1) == 0) {
+                collisionCheck(player);
             }
             move(player);
         });
@@ -65,10 +68,6 @@ public class Task extends BukkitRunnable {
             return;
         }
         if (player.isDead()) {
-            return;
-        }
-        double gametime = (System.currentTimeMillis() - flappybird.getPlayerRespawnTime().get(player)) / 20;
-        if (gametime < flappybird.getConfig().getInt("noCollisionTick", 40)) {
             return;
         }
 
