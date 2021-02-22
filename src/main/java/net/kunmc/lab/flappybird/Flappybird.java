@@ -1,5 +1,6 @@
 package net.kunmc.lab.flappybird;
 
+import net.kunmc.lab.flappybird.event.PlayerJumpEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -84,15 +85,26 @@ public final class Flappybird extends JavaPlugin {
     }
 
     public void jump(Player player) {
-        double power = getConfig().getDouble("jumpMin", 0);
+        double jumpMin = getConfig().getDouble("jumpMin", 0);
+        double ratio = getConfig().getDouble("ratio", 0);
+        double jumpMax = getConfig().getDouble("jumpMax", 0);
+
+        PlayerJumpEvent jumpEvent = new PlayerJumpEvent(player, jumpMin, jumpMax, ratio);
+        Bukkit.getPluginManager().callEvent(jumpEvent);
+
+        if (jumpEvent.isCancelled()) {
+            return;
+        }
+
+        double power = jumpEvent.getJumpMin();
         long chargeTime = System.currentTimeMillis() - getPlayerChargeStartTime().get(player);
-        double ratio = (chargeTime / 50) * getConfig().getDouble("ratio", 0) + 1.0;
-        power = Math.min(power * ratio, getConfig().getDouble("jumpMax", 0));
+        double rate = (chargeTime / 50) * jumpEvent.getRatio() + 1.0;
+        power = Math.min(power * rate, jumpEvent.getJumpMax());
         Vector vector = player.getVelocity().setY(power);
         player.setVelocity(vector);
 
         double pitchRatio = getConfig().getDouble("pitchRatio", 0.5);
-        float pitch = (float) Math.max(Math.min((1 / ratio * pitchRatio), 2.0), 0.5);
+        float pitch = (float) Math.max(Math.min((1 / rate * pitchRatio), 2.0), 0.5);
         player.getWorld().playSound(player.getLocation(), "jump", SoundCategory.NEUTRAL, 1.0f, pitch);
 
         if (!getConfig().getBoolean("particle")) {

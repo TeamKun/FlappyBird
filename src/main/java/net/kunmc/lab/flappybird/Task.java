@@ -36,6 +36,9 @@ public class Task extends BukkitRunnable {
             if (flappybird.getConfig().getInt("tutorialTick", 0) > gametime || flappybird.getConfig().getBoolean("training")) {
                 player.sendActionBar(flappybird.ACTIONBAR);
             }
+            if (gametime < flappybird.getConfig().getInt("noCollisionTick", 40)) {
+                return;
+            }
             move(player);
         });
         count ++;
