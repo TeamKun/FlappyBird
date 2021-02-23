@@ -10,6 +10,7 @@ public class FlappyEvent extends Event implements Cancellable {
 
     protected static final HandlerList handlers = new HandlerList();
     protected final Player player;
+    private boolean cancelled = false;
 
     public FlappyEvent(Player player) {
         this.player = player;
@@ -29,11 +30,11 @@ public class FlappyEvent extends Event implements Cancellable {
 
     @Override
     public boolean isCancelled() {
-        return false;
+        return cancelled;
     }
 
     @Override
     public void setCancelled(boolean b) {
-
+        cancelled = b;
     }
 }
